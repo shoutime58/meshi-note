@@ -1,6 +1,6 @@
 // めしノート — オフラインでも開けるようにするための最小のサービスワーカー
 // アプリを更新したら、下の数字を1つ増やしてから push してください（古い画面が残らなくなります）
-const CACHE = "meshinote-v1";
+const CACHE = "meshinote-v5";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
