@@ -329,6 +329,75 @@ h2.h, .h{font-family:var(--font-round); font-size:14px; color:var(--sumi)}
 .empty-title{font-family:var(--font-round); font-size:17px; color:var(--brand-deep)}
 
 :focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+
+/* --- 7日間の記録ドット --- */
+.strip-week{margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:5px}
+.strip-week-label{font-size:10px; color:var(--soft)}
+.strip-dots{gap:7px}
+.wk{display:flex; flex-direction:column; align-items:center; gap:3px}
+.wk i{font-style:normal; font-size:9px; color:var(--soft); line-height:1}
+.dot{width:8px; height:8px; background:var(--brand-tint); border:1px solid var(--brand-soft)}
+.dot-on{background:var(--brand); border-color:var(--brand)}
+
+/* --- 食事ごとの内訳 --- */
+.split{gap:15px}
+.split-row2{display:flex; flex-direction:column; gap:6px}
+.split-head{display:flex; align-items:baseline; gap:8px}
+.split-name{font-size:13.5px; font-family:var(--font-round); font-weight:700}
+.split-n{font-size:10.5px; color:var(--soft)}
+.split-kcal{margin-left:auto; font-size:11px; color:var(--soft)}
+.split-kcal b{font-size:16px; color:var(--brand-deep); margin-right:2px}
+.split-kcal i{font-style:normal; font-size:10.5px; color:var(--soft)}
+.split-track{height:9px; border-radius:5px}
+.split-fill{border-radius:5px}
+.split-pfc{display:flex; gap:12px; font-size:10.5px; color:var(--soft)}
+.split-pfc b{color:var(--sumi); font-size:11.5px}
+.split-total{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; margin-top:16px; padding-top:13px; border-top:1px solid var(--line)}
+.split-total span{font-size:12px; color:var(--soft)}
+.split-total em{margin-left:auto; font-style:normal; font-size:11px; color:var(--soft)}
+.split-total em b{font-size:21px; color:var(--brand-deep); margin-right:2px}
+.split-total i{font-style:normal; font-size:10.5px; color:var(--soft); width:100%; text-align:right; margin-top:2px}
+
+/* --- からだの記録 --- */
+.wcard{margin-top:16px}
+.wrow{display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap}
+.wnow{flex:1; min-width:120px}
+.wnow > span{font-size:11px; color:var(--soft)}
+.wnow > div{display:flex; align-items:baseline; gap:3px; margin-top:2px}
+.wnow b{font-size:30px; color:var(--brand-deep)}
+.wnow i{font-style:normal; font-size:12px; color:var(--soft)}
+.wdiff{display:inline-block; font-style:normal; font-size:11px; font-weight:700;
+  padding:2px 8px; border-radius:20px; margin-top:4px}
+.wdiff.is-down{background:var(--brand-tint); color:var(--brand-deep)}
+.wdiff.is-up{background:#FBEAE5; color:#B8462A}
+.win{display:flex; gap:8px; align-items:center; flex:0 0 auto}
+.win .input{width:92px; text-align:center; font-size:17px; font-family:var(--font-num); font-weight:700}
+.win .btn{width:auto; padding:12px 18px; white-space:nowrap}
+
+/* --- 目標までの進み具合 --- */
+.prog-head{display:flex; align-items:baseline; gap:7px; font-size:11.5px; color:var(--soft); flex-wrap:wrap}
+.prog-head b{font-size:19px; color:var(--brand-deep); margin-right:1px}
+.prog-arrow{color:var(--brand-soft)}
+.prog-pct{margin-left:auto; font-style:normal; font-size:20px; font-weight:700;
+  font-family:var(--font-num); color:var(--brand)}
+.prog-track{height:12px; background:var(--brand-tint); border-radius:6px; overflow:hidden; margin:11px 0 9px}
+.prog-fill{height:100%; border-radius:6px; background:linear-gradient(90deg,#4CAF7D,#2F8F5B); transition:width .6s ease}
+.prog-foot{display:flex; justify-content:space-between; gap:10px; font-size:11.5px; color:var(--soft); flex-wrap:wrap}
+.prog-foot b{color:var(--brand-deep); font-size:13.5px}
+
+/* --- 前回の食事をコピー --- */
+.copyprev{padding:2px 18px 10px}
+.copyprev .btn{display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 14px; font-size:13.5px}
+.copyprev em{font-style:normal; font-size:11px; color:var(--soft); font-weight:400}
+
+/* --- からだの記録（記録済みのときの一行表示） --- */
+.wmini-card{padding:11px 15px}
+.wmini{display:flex; align-items:baseline; gap:7px}
+.wmini-label{font-size:11.5px; color:var(--soft)}
+.wmini b{font-size:20px; color:var(--brand-deep)}
+.wmini i{font-style:normal; font-size:11px; color:var(--soft)}
+.wmini .wdiff{margin-top:0}
+.wmini-edit{margin-left:auto; font-size:12px; padding:0}
 </style>
 </head>
 <body>
@@ -418,6 +487,13 @@ function fmtDate(k){
   const d=parseKey(k);
   return (d.getMonth()+1)+"月"+d.getDate()+"日（"+WEEK[d.getDay()]+"）";
 }
+function fmtShort(k){           // 「昨日」「9/12（木）」のような短い表記
+  const t=toKey(new Date());
+  if(k===shiftDay(t,-1)) return "昨日";
+  if(k===shiftDay(t,-2)) return "一昨日";
+  const d=parseKey(k);
+  return (d.getMonth()+1)+"/"+d.getDate()+"（"+WEEK[d.getDay()]+"）";
+}
 const sum = list => (list||[]).reduce((a,e)=>({
   kcal:a.kcal+(+e.kcal||0), protein:a.protein+(+e.protein||0),
   fat:a.fat+(+e.fat||0), carb:a.carb+(+e.carb||0)
@@ -450,6 +526,28 @@ function loadAll(){
     }
   }catch(e){ console.warn("保存データを読めませんでした", e); }
   return {profile, log};
+}
+const W_KEY = "meshinote:weights";
+function loadWeights(){
+  try{ return JSON.parse(localStorage.getItem(W_KEY) || "{}") || {}; }catch(e){ return {}; }
+}
+function saveWeights(){
+  try{ localStorage.setItem(W_KEY, JSON.stringify(S.weights)); }
+  catch(e){ alert("保存できませんでした。ブラウザの空き容量をご確認ください。"); }
+}
+// 目標の起点。「この目標にする」を押した日の体重を基準にする
+function startWeight(){
+  if(S.profile.startWeight) return +S.profile.startWeight;
+  const ks = Object.keys(S.weights).sort();
+  return ks.length ? +S.weights[ks[0]] : +S.profile.weight;
+}
+function latestWeight(){
+  const ks = Object.keys(S.weights).sort();
+  return ks.length ? +S.weights[ks[ks.length-1]] : +S.profile.weight;
+}
+function prevWeight(beforeKey){
+  const ks = Object.keys(S.weights).filter(k=>k<beforeKey).sort();
+  return ks.length ? +S.weights[ks[ks.length-1]] : null;
 }
 function saveProfile(){ try{ localStorage.setItem(P_KEY, JSON.stringify(S.profile)); }catch(e){ alert("保存できませんでした。ブラウザの空き容量をご確認ください。"); } }
 function saveMonth(month){
@@ -651,6 +749,7 @@ const boot = loadAll();
 const S = {
   profile: boot.profile,
   log: boot.log,
+  weights: loadWeights(),
   quota: loadQuota(),
   dateKey: toKey(new Date()),
   view: "home",
@@ -680,20 +779,36 @@ function pfcBars(t, g){
     </div>`).join("")}</div>`;
 }
 function barChart(days, target){
-  const W=320,H=150,pad=22, bw=26;
-  const max = Math.max(target*1.2, ...days.map(d=>d.kcal), 1);
-  const y = v => H-pad - (v/max)*(H-pad-10);
+  // 上に余白を作り、目標ラベルは棒が届かない位置（グラフの外）に置く
+  const W=340, H=214, top=48, base=H-36, slot=(W-6)/7;
+  const max = Math.max(target*1.25, ...days.map(d=>d.kcal), 1);
+  const y  = v => base - (v/max)*(base-top);
+  const ty = y(target);
   const bars = days.map((d,i)=>{
-    const x = pad + i*((W-pad-8)/7) + 4;
-    const h = Math.max(0, H-pad - y(d.kcal));
-    const fill = d.kcal>target ? COL.kaki : COL.ai;
-    const op = d.key===S.dateKey ? 1 : .5;
-    return `<rect x="${x}" y="${y(d.kcal)}" width="${bw}" height="${h}" rx="4" fill="${fill}" opacity="${op}"/>
-      <text x="${x+bw/2}" y="${H-6}" font-size="11" fill="${COL.soft}" text-anchor="middle">${d.label}</text>`;
+    const cx = 3 + i*slot + slot/2;
+    const bw = Math.min(30, slot-10);
+    const x  = cx - bw/2;
+    const has = d.kcal > 0;
+    const h  = has ? Math.max(4, base - y(d.kcal)) : 0;
+    const isToday = d.key === S.dateKey;
+    const over = d.kcal > target;
+    const fill = over ? COL.kaki : "#2F8F5B";
+    const dd = parseKey(d.key).getDate();
+    return `
+      ${has
+        ? `<rect x="${x}" y="${base-h}" width="${bw}" height="${h}" rx="6" fill="${fill}" opacity="${isToday?1:.5}"/>
+           <text x="${cx}" y="${base-h-7}" font-size="10.5" text-anchor="middle"
+                 fill="${isToday?fill:COL.soft}" font-weight="${isToday?"700":"400"}">${Math.round(d.kcal)}</text>`
+        : `<rect x="${x}" y="${base-5}" width="${bw}" height="5" rx="2.5" fill="${COL.line}"/>`}
+      <text x="${cx}" y="${base+16}" font-size="10.5" text-anchor="middle"
+            fill="${isToday?"#1F6B42":COL.soft}" font-weight="${isToday?"700":"400"}">${d.label}</text>
+      <text x="${cx}" y="${base+28}" font-size="9.5" fill="${COL.soft}" text-anchor="middle">${dd}</text>`;
   }).join("");
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="150" role="img" aria-label="7日間のカロリー">
-    <line x1="${pad-6}" y1="${H-pad}" x2="${W}" y2="${H-pad}" stroke="${COL.line}"/>
-    <line x1="${pad-6}" y1="${y(target)}" x2="${W}" y2="${y(target)}" stroke="${COL.kaki}" stroke-dasharray="4 4"/>
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="214" role="img" aria-label="7日間のカロリーの棒グラフ">
+    <line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="${COL.line}"/>
+    <line x1="0" y1="${ty}" x2="${W}" y2="${ty}" stroke="${COL.kaki}" stroke-width="1.2" stroke-dasharray="5 4" opacity=".7"/>
+    <line x1="${W-118}" y1="14" x2="${W-96}" y2="14" stroke="${COL.kaki}" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="${W-90}" y="17.5" font-size="10.5" fill="${COL.kaki}">目標 ${target}kcal</text>
     ${bars}
   </svg>`;
 }
@@ -763,9 +878,13 @@ function homeHtml(){
   const entries = S.log[S.dateKey] || [];
   const t = sum(entries), g = goals(S.profile), sc = calcScore(t, S.profile);
   const remain = Math.round(S.profile.targetKcal - t.kcal);
+  // 直近7日、記録がある日を塗る。何の印か分かるよう曜日と見出しを添える
   const dots = [6,5,4,3,2,1,0].map(i=>{
     const k = shiftDay(S.dateKey,-i);
-    return `<span class="dot ${(S.log[k]||[]).length?"dot-on":""}"></span>`;
+    const on = (S.log[k]||[]).length > 0;
+    return `<span class="wk" title="${k}${on?" 記録あり":" 記録なし"}">
+      <i>${WEEK[parseKey(k).getDay()]}</i>
+      <span class="dot ${on?"dot-on":""}"></span></span>`;
   }).join("");
   const coachLeft = quotaLeft("coach");
   const coachText = S.coach.text || S.quota.coachText || "";
@@ -797,12 +916,125 @@ function homeHtml(){
     <section class="strip">
       <div class="strip-item"><span>連続記録</span><b class="num">${streakDays()}</b><i>日</i></div>
       <div class="strip-item"><span>今日の点数</span>${sc?`<b class="num">${sc.total}</b><i>点</i>`:`<em>未記録</em>`}</div>
-      <div class="strip-dots">${dots}</div>
+      <div class="strip-week">
+        <span class="strip-week-label">この7日間の記録</span>
+        <div class="strip-dots">${dots}</div>
+      </div>
     </section>
+    ${weightCard()}
     ${timelineHtml(entries)}
     ${coachBlock}
     <div class="spacer"></div>
   </main>`;
+}
+
+function weightCard(){
+  const today = S.dateKey;
+  const w = S.weights[today];
+  const before = prevWeight(today);
+  const diff = (w && before != null) ? Math.round((w - before)*10)/10 : null;
+  const diffTag = diff !== null
+    ? `<em class="wdiff ${diff<=0?"is-down":"is-up"}">${diff>0?"+":""}${diff.toFixed(1)}kg</em>` : "";
+
+  // 記録済みの日は一行に畳んで、場所を取らないようにする
+  if(w && !S.editWeight){
+    return `<section class="card wcard wmini-card">
+      <div class="wmini">
+        <span class="wmini-label">${fmtDate(today)}の体重</span>
+        <b class="num">${w.toFixed(1)}</b><i>kg</i>
+        ${diffTag}
+        <button class="link wmini-edit" data-act="edit-weight">編集</button>
+      </div>
+    </section>`;
+  }
+
+  return `<section class="card wcard">
+    <h2 class="h">からだの記録</h2>
+    <div class="wrow">
+      <div class="wnow">
+        <span>${fmtDate(today)}の体重</span>
+        <div><b class="num">${w ? w.toFixed(1) : "—"}</b><i>kg</i></div>
+        ${diff !== null ? `<em class="wdiff ${diff<=0?"is-down":"is-up"}">前回より ${diff>0?"+":""}${diff.toFixed(1)}kg</em>` : ""}
+      </div>
+      <div class="win">
+        <input class="input" type="number" inputmode="decimal" step="0.1" min="20" max="250"
+               id="wIn" value="${w ?? ""}" placeholder="${(+S.profile.weight).toFixed(1)}" aria-label="体重（kg）">
+        <button class="btn btn-primary" data-act="save-weight">${w ? "更新" : "記録"}</button>
+        ${w ? `<button class="link" data-act="cancel-weight">やめる</button>` : ""}
+      </div>
+    </div>
+  </section>`;
+}
+
+function goalProgress(){
+  const p = S.profile;
+  if(p.goal !== "lose") return "";
+  const st = startWeight(), now = latestWeight(), want = +p.loseKg || 0;
+  if(!want) return "";
+  const done = Math.round((st - now)*10)/10;
+  const pct  = Math.max(0, Math.min(100, Math.round(done / want * 100)));
+  const rest = Math.round((want - done)*10)/10;
+  return `<section class="card"><h2 class="h">目標までの進み具合</h2>
+    <div class="prog-head">
+      <span>開始 <b class="num">${st.toFixed(1)}</b>kg</span>
+      <span class="prog-arrow">→</span>
+      <span>いま <b class="num">${now.toFixed(1)}</b>kg</span>
+      <em class="prog-pct">${pct}%</em>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <div class="prog-foot">
+      <span>${done > 0 ? `<b>${done.toFixed(1)}kg</b> 減りました` : (done < 0 ? `<b>${Math.abs(done).toFixed(1)}kg</b> 増えています` : "まだ変化はありません")}</span>
+      <span>${rest > 0 ? `目標まであと <b>${rest.toFixed(1)}kg</b>` : "目標を達成しました！"}</span>
+    </div>
+    <p class="cap">体重を記録すると、ここが進みます。開始の体重は「目標」タブで「この目標にする」を押したときの値です。</p>
+  </section>`;
+}
+
+function weightChart(){
+  const N = 14;
+  const days = [];
+  for(let i=N-1;i>=0;i--){ const k = shiftDay(S.dateKey,-i); days.push({ key:k, w:S.weights[k] }); }
+  const pts = days.map((d,i)=>({i, w:d.w ? +d.w : null, key:d.key})).filter(d=>d.w);
+  if(!pts.length) return `<p class="cap">まだ体重の記録がありません。「記録」タブの「からだの記録」から入力できます。</p>`;
+
+  const p = S.profile;
+  const goalW = p.goal==="lose" ? startWeight() - (+p.loseKg||0) : null;
+  const vals = pts.map(d=>d.w).concat(goalW ? [goalW] : []);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if(hi - lo < 1){ const c = (hi+lo)/2; lo = c - 0.6; hi = c + 0.6; }
+  const m = (hi - lo) * 0.18; lo -= m; hi += m;
+
+  const W=340, H=180, top=16, base=H-30, left=36;
+  const x = i => left + i*((W-left-10)/(N-1));
+  const y = v => base - ((v-lo)/(hi-lo))*(base-top);
+
+  const line = pts.map((d,i)=>`${i?"L":"M"}${x(d.i).toFixed(1)} ${y(d.w).toFixed(1)}`).join(" ");
+  const last = pts[pts.length-1];
+  const dots = pts.map(d=>{
+    const isLast = d === last;
+    return `<circle cx="${x(d.i).toFixed(1)}" cy="${y(d.w).toFixed(1)}" r="${isLast?4.5:3}"
+             fill="${isLast?"#1F6B42":"#2F8F5B"}" stroke="#fff" stroke-width="${isLast?2:1.5}"/>`;
+  }).join("");
+
+  const ticks = [0, Math.floor((N-1)/2), N-1].map(i=>{
+    const d = parseKey(days[i].key);
+    return `<text x="${x(i)}" y="${base+18}" font-size="9.5" fill="${COL.soft}" text-anchor="middle">${d.getMonth()+1}/${d.getDate()}</text>`;
+  }).join("");
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="180" role="img" aria-label="体重の推移">
+    <line x1="${left}" y1="${base}" x2="${W-4}" y2="${base}" stroke="${COL.line}"/>
+    <text x="${left-6}" y="${top+4}" font-size="9.5" fill="${COL.soft}" text-anchor="end">${hi.toFixed(1)}</text>
+    <text x="${left-6}" y="${base+3}" font-size="9.5" fill="${COL.soft}" text-anchor="end">${lo.toFixed(1)}</text>
+    ${goalW ? `<line x1="${left}" y1="${y(goalW).toFixed(1)}" x2="${W-4}" y2="${y(goalW).toFixed(1)}"
+        stroke="#2F8F5B" stroke-width="1.2" stroke-dasharray="5 4" opacity=".8"/>
+      <rect x="${W-84}" y="${(y(goalW)-15).toFixed(1)}" width="80" height="14" rx="7" fill="#E4F2E9"/>
+      <text x="${W-44}" y="${(y(goalW)-4.5).toFixed(1)}" font-size="9" fill="#1F6B42" text-anchor="middle">目標 ${goalW.toFixed(1)}kg</text>` : ""}
+    <path d="${line}" fill="none" stroke="#2F8F5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${x(last.i)}" y="${Math.max(11, y(last.w)-10).toFixed(1)}" font-size="11" font-weight="700"
+          fill="#1F6B42" text-anchor="middle">${last.w.toFixed(1)}kg</text>
+    ${ticks}
+  </svg>`;
 }
 
 function dashHtml(){
@@ -814,11 +1046,17 @@ function dashHtml(){
   const rec = days.filter(d=>d.kcal>0);
   const avg = rec.length ? Math.round(rec.reduce((a,d)=>a+d.kcal,0)/rec.length) : 0;
   const t = sum(S.log[S.dateKey]);
-  const share = MEALS.map(m=>({
-    name:m.label,
-    kcal:Math.round(sum((S.log[S.dateKey]||[]).filter(e=>e.meal===m.key)).kcal)
-  }));
+  const share = MEALS.map(m=>{
+    const es = (S.log[S.dateKey]||[]).filter(e=>e.meal===m.key);
+    const v = sum(es);
+    return { name:m.label, n:es.length, kcal:Math.round(v.kcal),
+             p:Math.round(v.protein), f:Math.round(v.fat), c:Math.round(v.carb) };
+  });
+  const dayKcal = Math.round(t.kcal);
   return `<main class="main"><div class="dash">
+    ${goalProgress()}
+    <section class="card"><h2 class="h">体重の推移（14日間）</h2>
+      ${weightChart()}</section>
     <section class="card"><h2 class="h">7日間のカロリー</h2>
       ${barChart(days, S.profile.targetKcal)}
       <p class="cap">記録した日の平均 ${avg}kcal ／ 目標 ${S.profile.targetKcal}kcal（点線）</p></section>
@@ -826,9 +1064,24 @@ function dashHtml(){
       <p class="cap">目標比率は P${S.profile.ratio.p}% F${S.profile.ratio.f}% C${S.profile.ratio.c}% です。</p></section>
     <section class="card"><h2 class="h">食事ごとの内訳</h2>
       <div class="split">${share.map(m=>`
-        <div class="split-row"><span>${m.name}</span>
-          <div class="split-track"><div class="split-fill" style="width:${Math.min(100,m.kcal/Math.max(1,S.profile.targetKcal)*100)}%"></div></div>
-          <b>${m.kcal}</b></div>`).join("")}</div></section>
+        <div class="split-row2">
+          <div class="split-head">
+            <b class="split-name">${m.name}</b>
+            <span class="split-n">${m.n ? m.n+"品" : "記録なし"}</span>
+            <span class="split-kcal"><b class="num">${m.kcal}</b>kcal${
+              dayKcal ? ` <i>${Math.round(m.kcal/dayKcal*100)}%</i>` : ""}</span>
+          </div>
+          <div class="split-track"><div class="split-fill" style="width:${dayKcal?Math.round(m.kcal/dayKcal*100):0}%"></div></div>
+          ${m.n ? `<div class="split-pfc"><span>たんぱく質 <b>${m.p}</b>g</span><span>脂質 <b>${m.f}</b>g</span><span>炭水化物 <b>${m.c}</b>g</span></div>` : ""}
+        </div>`).join("")}
+      </div>
+      <div class="split-total">
+        <span>1日の合計</span>
+        <em><b class="num">${dayKcal}</b>kcal</em>
+        <i>目標 ${S.profile.targetKcal}kcal</i>
+      </div>
+      <p class="cap">帯の長さは、その日に食べた量のうち各食事が占める割合です。</p>
+    </section>
   </div><div class="spacer"></div></main>`;
 }
 
@@ -945,6 +1198,16 @@ function closeSheet(){ S.sheet=null; $("#sheet").innerHTML=""; }
 
 function draftTotal(){ return sum(S.sheet.drafts); }
 
+// 同じ食事区分で、直近（最大7日前まで）に記録がある日を探す
+function lastSameMeal(mealKey, beforeKey){
+  for(let i=1;i<=7;i++){
+    const k = shiftDay(beforeKey, -i);
+    const es = (S.log[k]||[]).filter(e=>e.meal===mealKey);
+    if(es.length) return { key:k, entries:es, total:sum(es) };
+  }
+  return null;
+}
+
 function searchBodyHtml(){
   const s = S.sheet;
   if(!s) return "";
@@ -981,7 +1244,7 @@ function renderSheet(){
       <button class="btn" data-act="pick" ${photoLeft?"":"disabled"}>写真を選ぶ</button>
     </div>
     ${photoLeft
-      ? `<p class="cap">AIの写真解析は本日あと<b>${photoLeft}回</b>です（1日${LIMITS.photo}回まで）。</p>`
+      ? `<p class="cap">写真から記録できるのは本日あと<b>${photoLeft}回</b>です（1日${LIMITS.photo}回まで）。<br>解析しただけでは減りません。「記録する」を押した時に1回ぶん使います。</p>`
       : `<p class="cap">本日分（1日${LIMITS.photo}回まで）を使い切りました。日付が変わるとまた使えます。「さがす」「手入力」はいつでも使えます。</p>`}
     </div>`;
 
@@ -991,6 +1254,13 @@ function renderSheet(){
     <input class="input" id="q" enterkeyhint="search" placeholder="料理名や食材を入力（例: 親子丼）" value="${esc(s.query)}">
     <div id="search-body">${searchBodyHtml()}</div>
   </div>`;
+
+  const prev = s.editingId ? null : lastSameMeal(s.meal, S.dateKey);
+  const copyPrevHtml = prev ? `<div class="copyprev">
+      <button class="btn btn-ghost" data-act="copy-prev">
+        ${fmtShort(prev.key)}の${MEALS.filter(m=>m.key===s.meal)[0].label}をコピー
+        <em>${prev.entries.length}品・${Math.round(prev.total.kcal)}kcal</em>
+      </button></div>` : "";
 
   const statusHtml = s.status ? `<div class="status status-${s.status.type}">
     ${s.status.type==="loading" ? `<span class="spin"></span>` : ""}
@@ -1023,6 +1293,7 @@ function renderSheet(){
           `<button class="chip ${s.meal===m.key?"chip-on":""}" data-act="meal" data-meal="${m.key}">${m.label}</button>`).join("")}</div>
         <input class="time" type="time" id="time" value="${s.time}" aria-label="食べた時間">
       </div>
+      ${copyPrevHtml}
       ${s.editingId ? "" : `<div class="tabs">${[["photo","写真から"],["search","さがす"],["manual","手入力"]]
         .map(x=>`<button class="tab ${s.tab===x[0]?"tab-on":""}" data-act="tab" data-tab="${x[0]}">${x[1]}</button>`).join("")}</div>`}
       <div class="sheet-body">
@@ -1069,10 +1340,7 @@ async function handleFile(file){
     const big = await resize(file, 1024, 0.8);
     const small = await resize(file, 128, 0.6);
     S.sheet.thumb = small;
-    useQuota("photo");
-    let r;
-    try{ r = await analyzeImage(big); }
-    catch(err){ refundQuota("photo"); throw err; }   // 届かなかった分は回数を戻す
+    const r = await analyzeImage(big);
     if(!r.items || !r.items.length){
       S.sheet.status = {type:"error", text:r.note || "食事を判別できませんでした。手入力に切り替えてください。"};
     }else{
@@ -1085,6 +1353,7 @@ async function handleFile(file){
         confidence: it.confidence
       }));
       S.sheet.status = {type:"note", text:r.note || "推定値です。ちがうところは直してください。"};
+      S.sheet.fromPhoto = true;   // 実際に記録した時点で1回消費する
     }
   }catch(e){
     S.sheet.status = {type:"error", text:"解析できませんでした。手入力でも記録できます。", detail:String(e.message||e)};
@@ -1101,6 +1370,7 @@ function saveEntries(){
     meal:s.meal, time:s.time, thumb:s.thumb||null
   }));
   if(!rows.length) return;
+  if(s.fromPhoto) useQuota("photo");   // 解析しただけでは消費せず、保存できて初めて1回とする
   let day = (S.log[S.dateKey]||[]).slice();
   if(s.editingId) day = day.filter(e=>e.id!==s.editingId);
   S.log[S.dateKey] = day.concat(rows).sort((a,b)=>mins(a.time)-mins(b.time));
@@ -1126,12 +1396,18 @@ function csvCell(v){
 function r1(n){ return Math.round((+n||0)*10)/10; }
 
 function buildCsv(){
-  const rows = [["日付","食事","時刻","料理名","分量","カロリー(kcal)","たんぱく質(g)","脂質(g)","炭水化物(g)"]];
-  Object.keys(S.log).sort().forEach(date=>{
-    (S.log[date]||[]).slice().sort((a,b)=>mins(a.time)-mins(b.time)).forEach(e=>{
+  const rows = [["日付","食事","時刻","料理名","分量","カロリー(kcal)","たんぱく質(g)","脂質(g)","炭水化物(g)","体重(kg)"]];
+  const dates = Array.from(new Set(Object.keys(S.log).concat(Object.keys(S.weights)))).sort();
+  dates.forEach(date=>{
+    const es = (S.log[date]||[]).slice().sort((a,b)=>mins(a.time)-mins(b.time));
+    const w  = S.weights[date] != null ? r1(S.weights[date]) : "";
+    if(!es.length){                       // 食事の記録がなく体重だけの日も残す
+      rows.push([date,"","","","","","","","", w]); return;
+    }
+    es.forEach((e,i)=>{
       const m = MEALS.filter(x=>x.key===e.meal)[0];
       rows.push([date, m?m.label:(e.meal||""), e.time||"", e.name||"", e.portion||"",
-                 Math.round(e.kcal||0), r1(e.protein), r1(e.fat), r1(e.carb)]);
+                 Math.round(e.kcal||0), r1(e.protein), r1(e.fat), r1(e.carb), i===0 ? w : ""]);
     });
   });
   // 先頭のBOMは、Excelで開いたときに日本語が化けないようにするための印
@@ -1155,14 +1431,16 @@ async function saveFile(name, text, mime){
 }
 
 function countEntries(){
-  return Object.keys(S.log).reduce((n,k)=>n+(S.log[k]||[]).length, 0);
+  return Object.keys(S.log).reduce((n,k)=>n+(S.log[k]||[]).length, 0)
+       + Object.keys(S.weights).length;
 }
 function exportCsv(){
   if(!countEntries()){ S.dataMsg = "まだ記録がありません。"; render(); return; }
   saveFile("めしノート-" + toKey(new Date()) + ".csv", buildCsv(), "text/csv");
 }
 function exportBackup(){
-  const data = JSON.stringify({version:1, savedAt:new Date().toISOString(), profile:S.profile, log:S.log});
+  const data = JSON.stringify({version:2, savedAt:new Date().toISOString(),
+                               profile:S.profile, log:S.log, weights:S.weights});
   saveFile("めしノート-バックアップ-" + toKey(new Date()) + ".json", data, "application/json");
 }
 function importBackup(file){
@@ -1176,7 +1454,8 @@ function importBackup(file){
       if(!confirm("いまの記録を、このバックアップ（" + n + "件）で置き換えます。よろしいですか？")) return;
       S.profile = Object.assign({}, DEFAULT_PROFILE, d.profile||{});
       S.log = d.log;
-      saveProfile();
+      S.weights = d.weights || {};
+      saveProfile(); saveWeights();
       for(let i=localStorage.length-1;i>=0;i--){
         const k = localStorage.key(i);
         if(k && k.indexOf("meshinote:log:")===0) localStorage.removeItem(k);
@@ -1217,6 +1496,21 @@ document.addEventListener("click", async (ev)=>{
   if(act==="tab"){ S.sheet.tab = el.dataset.tab; renderSheet(); return; }
   if(act==="pick"){ $("#pick").click(); return; }
   if(act==="shot"){ $("#shot").click(); return; }
+  if(act==="copy-prev"){
+    const prev = lastSameMeal(S.sheet.meal, S.dateKey);
+    if(prev){
+      prev.entries.forEach(e=>S.sheet.drafts.push({
+        name:e.name, portion:e.portion||"",
+        kcal:Math.round(e.kcal||0),
+        protein:Math.round((e.protein||0)*10)/10,
+        fat:Math.round((e.fat||0)*10)/10,
+        carb:Math.round((e.carb||0)*10)/10
+      }));
+      S.sheet.status = {type:"note", text:fmtShort(prev.key)+"の記録を写しました。量がちがうときは直してください。"};
+      S.sheet.tab = "manual";
+    }
+    renderSheet(); return;
+  }
   if(act==="add-blank"){ S.sheet.drafts.push({name:"",portion:"",kcal:"",protein:"",fat:"",carb:""}); S.sheet.tab="manual"; renderSheet(); return; }
   if(act==="rm-draft"){ S.sheet.drafts.splice(+el.dataset.i,1); renderSheet(); return; }
   if(act==="add-food"){
@@ -1273,7 +1567,25 @@ document.addEventListener("click", async (ev)=>{
     }
     render(); return;
   }
-  if(act==="apply-target"){ S.profile.targetKcal = calcTarget(S.profile).target; saveProfile(); render(); return; }
+  if(act==="edit-weight"){ S.editWeight = true; render(); return; }
+  if(act==="cancel-weight"){ S.editWeight = false; render(); return; }
+  if(act==="save-weight"){
+    const box = $("#wIn");
+    const v = box ? parseFloat(box.value) : NaN;
+    if(isNaN(v) || v < 20 || v > 250){ alert("体重を20〜250kgの範囲で入力してください。"); return; }
+    S.weights[S.dateKey] = Math.round(v*10)/10;
+    saveWeights();
+    S.profile.weight = Math.round(v*10)/10;   // 目標カロリーの計算も最新の体重に合わせる
+    saveProfile();
+    S.editWeight = false;
+    render(); return;
+  }
+  if(act==="apply-target"){
+    S.profile.targetKcal = calcTarget(S.profile).target;
+    S.profile.startWeight = +S.profile.weight;      // 目標を決めた時点を起点にする
+    S.profile.startDate = toKey(new Date());
+    saveProfile(); render(); return;
+  }
   if(act==="export-csv"){ S.dataMsg=null; exportCsv(); return; }
   if(act==="export-json"){ S.dataMsg=null; exportBackup(); return; }
   if(act==="import-json"){ S.dataMsg=null; $("#restore").click(); return; }
